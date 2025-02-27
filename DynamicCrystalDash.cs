@@ -10,7 +10,7 @@ namespace DynamicCrystalDash {
         public static float totalChargeTime;
         public static bool charging;
         new public string GetName() => "DynamicCrystalDash";
-        public override string GetVersion() => "1.0.0.0";
+        public override string GetVersion() => "1.0.0.1";
         public override void Initialize(Dictionary<string, Dictionary<string, GameObject>> preloadedObjects) {
             On.PlayMakerFSM.OnEnable += updateFSMs;
         }
@@ -18,27 +18,27 @@ namespace DynamicCrystalDash {
         private void updateFSMs(On.PlayMakerFSM.orig_OnEnable orig, PlayMakerFSM self) {
             orig(self);
             if(self.gameObject.name == "Knight" && self.FsmName == "Superdash") {
-                self.GetState("Relinquish Control").AddAction(new setChargeStart());
+                self.GetValidState("Relinquish Control").AddAction(new setChargeStart());
                 
-                FsmState wallChargeState = self.GetState("Wall Charge");
+                FsmState wallChargeState = self.GetValidState("Wall Charge");
                 wallChargeState.ChangeTransition("BUTTON UP", "Wall Charged");
                 wallChargeState.RemoveAction(15);
-                FsmState groundChargeState = self.GetState("Ground Charge");
+                FsmState groundChargeState = self.GetValidState("Ground Charge");
                 groundChargeState.ChangeTransition("BUTTON UP", "Ground Charged");
                 groundChargeState.RemoveAction(10);
 
-                FsmState leftState = self.GetState("Left");
+                FsmState leftState = self.GetValidState("Left");
                 leftState.RemoveAction(0);
                 leftState.InsertAction(new setDynamicSpeed(self, -1), 0);
-                FsmState rightState = self.GetState("Right");
+                FsmState rightState = self.GetValidState("Right");
                 rightState.RemoveAction(0);
                 rightState.InsertAction(new setDynamicSpeed(self, 1), 0);
 
-                self.GetState("Cancelable").RemoveAction(1);
+                self.GetValidState("Cancelable").RemoveAction(1);
             }
             else if(self.gameObject.name.StartsWith("SD Crystal Gen") && self.FsmName == "superdash_crystal_gen") {
                 int index = (self.gameObject.name.StartsWith("SD Crystal Gen G") ? 3 : 1);
-                FsmState chargingState = self.GetState("Charging");
+                FsmState chargingState = self.GetValidState("Charging");
                 chargingState.RemoveAction(index);
                 chargingState.InsertAction(new fakeiTweenMoveBy(self.gameObject),index);
             }
